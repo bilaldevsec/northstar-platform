@@ -31,6 +31,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: GitLeaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -55,11 +60,6 @@ jobs:
           framework: terraform
           quiet: true
           soft_fail: true
-
-      - name: GitLeaks Secret Scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   plan:
     if: github.event_name == 'pull_request'
