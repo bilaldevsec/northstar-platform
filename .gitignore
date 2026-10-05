@@ -1,0 +1,19 @@
+# Terraform local state and binary caches
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+terraform.tfvars
+
+# Shell environments & keys
+.env
+*.env
+*.pem
+*.key
+
+# OS & Editor files
+.DS_Store
+.vscode/
+.idea/
+*.log
