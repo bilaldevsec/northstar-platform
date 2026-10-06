@@ -1,0 +1,7 @@
+# CODEOWNERS for NorthStar Platform
+# Sensitive infrastructure, networking, governance, and CI/CD paths
+
+/network/ @bilaldevsec
+/platform/ @bilaldevsec
+/governance/ @bilaldevsec
+/.github/workflows/ @bilaldevsec

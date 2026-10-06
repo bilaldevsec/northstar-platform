@@ -1,0 +1,117 @@
+name: Scheduled Infrastructure Drift Detection
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+concurrency:
+  group: drift-detection
+  cancel-in-progress: false
+
+jobs:
+  detect-drift:
+    name: Detect Drift (${{ matrix.stack }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack: [network, platform]
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_PLAN }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: "true"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_PLAN }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Terraform Init
+        working-directory: ${{ matrix.stack }}
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=rg-nsp-tfstate" \
+            -backend-config="storage_account_name=${{ vars.STATE_STORAGE }}" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=${{ matrix.stack }}.tfstate" \
+            -backend-config="use_azuread_auth=true" \
+            -backend-config="use_oidc=true"
+
+      - name: Terraform Plan & Drift Check
+        id: drift_check
+        working-directory: ${{ matrix.stack }}
+        env:
+          TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_admin_ip_cidr: ${{ vars.ADMIN_IP_CIDR }}
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -no-color > plan_output.txt
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          cat plan_output.txt
+
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "DRIFT_STATUS=CLEAN" >> "$GITHUB_ENV"
+            echo "No changes or drift detected."
+            exit 0
+          elif [ $EXIT_CODE -eq 2 ]; then
+            echo "DRIFT_STATUS=DRIFT_DETECTED" >> "$GITHUB_ENV"
+            echo "Infrastructure drift detected!"
+            exit 0
+          else
+            echo "Terraform plan encountered an error."
+            exit $EXIT_CODE
+          fi
+
+      - name: Create GitHub Issue on Drift
+        if: steps.drift_check.outputs.exit_code == '2'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const planOutput = fs.existsSync('${{ matrix.stack }}/plan_output.txt')
+              ? fs.readFileSync('${{ matrix.stack }}/plan_output.txt', 'utf8')
+              : 'Drift detected, but plan output log not found.';
+            const truncatedPlan = planOutput.length > 50000 ? planOutput.substring(0, 50000) + '\n...[truncated]' : planOutput;
+            
+            const title = `⚠️ Infrastructure Drift Detected: [${{ matrix.stack }}]`;
+            const body = `### Infrastructure Drift Notification
+            
+            The scheduled drift detection workflow identified drift in the **${{ matrix.stack }}** Terraform stack.
+            
+            - **Workflow Run**: [Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - **Trigger**: ${{ github.event_name }}
+            - **Stack**: \`${{ matrix.stack }}\`
+            
+            #### Terraform Plan Output:
+            \`\`\`hcl
+            ${truncatedPlan}
+            \`\`\`
+            
+            *Please review the state and reconcile unmanaged changes or update code to prevent configuration drift.*`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['drift', 'infrastructure', 'security']
+            });

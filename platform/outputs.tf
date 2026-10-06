@@ -32,3 +32,8 @@ output "postgres_admin_login" {
   description = "The administrator login for the PostgreSQL server."
   value       = azurerm_postgresql_flexible_server.db.administrator_login
 }
+
+output "acr_name" {
+  description = "The name of the Azure Container Registry."
+  value       = azurerm_container_registry.acr.name
+}

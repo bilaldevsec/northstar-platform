@@ -1,0 +1,3 @@
+[2026-10-06T09:31:48Z] [GRANT] User: mohomad.bilaljaved.99@hotmail.com | Role: Reader | Scope: /subscriptions/7fb77266-5bb4-4d03-8a91-a744fd38db5c/resourceGroups/rg-nsp-platform-dev | Duration: 2m | Reason: NSP-Audit: Phase A validation
+[2026-10-06T09:33:03Z] [GRANT] User: mohomad.bilaljaved.99@hotmail.com | Role: Reader | Scope: /subscriptions/7fb77266-5bb4-4d03-8a91-a744fd38db5c/resourceGroups/rg-nsp-platform-dev | Duration: 2m | Reason: NSP-Audit: Phase A validation
+[2026-10-06T09:35:26Z] [REVOKE] User: 0e4df812-66ae-4ad9-8bde-16a2280185b2 | Role: Reader | Scope: /subscriptions/7fb77266-5bb4-4d03-8a91-a744fd38db5c/resourceGroups/rg-nsp-platform-dev | Status: Revoked after 2m

@@ -1,0 +1,33 @@
+[
+  {
+    "assignableScopes": [
+      "/subscriptions/7fb77266-5bb4-4d03-8a91-a744fd38db5c"
+    ],
+    "createdBy": "0e4df812-66ae-4ad9-8bde-16a2280185b2",
+    "createdOn": "2026-10-06T09:30:36.191404+00:00",
+    "description": "Allows start, stop, and read operations on NorthStar AKS managed clusters and reading resource groups.",
+    "id": "/subscriptions/7fb77266-5bb4-4d03-8a91-a744fd38db5c/providers/Microsoft.Authorization/roleDefinitions/9094c68f-4119-4aaa-b0d5-bfcf7cfda843",
+    "name": "9094c68f-4119-4aaa-b0d5-bfcf7cfda843",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.ContainerService/managedClusters/read",
+          "Microsoft.ContainerService/managedClusters/start/action",
+          "Microsoft.ContainerService/managedClusters/stop/action",
+          "Microsoft.Resources/subscriptions/resourceGroups/read"
+        ],
+        "condition": null,
+        "conditionVersion": null,
+        "dataActions": [],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "roleName": "NorthStar AKS Operator",
+    "roleType": "CustomRole",
+    "systemData": null,
+    "type": "Microsoft.Authorization/roleDefinitions",
+    "updatedBy": "0e4df812-66ae-4ad9-8bde-16a2280185b2",
+    "updatedOn": "2026-10-06T09:30:36.191404+00:00"
+  }
+]
