@@ -8,7 +8,7 @@ resource "random_string" "suffix" {
 
 resource "azurerm_resource_group" "platform" {
   name     = "rg-nsp-platform-${var.env}"
-  location = var.location
+  location = data.azurerm_resource_group.network.location
 }
 
 resource "azurerm_key_vault" "kv" {
