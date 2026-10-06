@@ -71,6 +71,11 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_PLAN }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: "true"
     strategy:
       matrix:
         stack: [network]
@@ -98,7 +103,8 @@ jobs:
             -backend-config="storage_account_name=${{ vars.STATE_STORAGE }}" \
             -backend-config="container_name=tfstate" \
             -backend-config="key=${{ matrix.stack }}.tfstate" \
-            -backend-config="use_azuread_auth=true"
+            -backend-config="use_azuread_auth=true" \
+            -backend-config="use_oidc=true"
 
       - name: Terraform Plan
         working-directory: ${{ matrix.stack }}
@@ -144,6 +150,11 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     environment: prod
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_APPLY }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: "true"
     strategy:
       max-parallel: 1
       matrix:
@@ -172,7 +183,8 @@ jobs:
             -backend-config="storage_account_name=${{ vars.STATE_STORAGE }}" \
             -backend-config="container_name=tfstate" \
             -backend-config="key=${{ matrix.stack }}.tfstate" \
-            -backend-config="use_azuread_auth=true"
+            -backend-config="use_azuread_auth=true" \
+            -backend-config="use_oidc=true"
 
       - name: Terraform Plan
         working-directory: ${{ matrix.stack }}
