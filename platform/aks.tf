@@ -31,7 +31,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name            = "system"
     node_count      = 1
-    vm_size         = "Standard_B2s"
+    vm_size         = "Standard_B2s_v2"
     vnet_subnet_id  = data.azurerm_subnet.aks.id
     os_disk_size_gb = 30
     os_disk_type    = "Managed"
