@@ -1,0 +1,7 @@
+[allowlist]
+description = "Allowlist for audit evidence and architectural docs"
+paths = [
+  '''docs/evidence/.*''',
+  '''docs/mock-audit-findings.md''',
+  '''governance/risk-register.csv'''
+]

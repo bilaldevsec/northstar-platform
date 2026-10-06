@@ -1,0 +1,3 @@
+ID,Risk statement,Likelihood,Impact,Inherent,Existing controls,Residual,Treatment,Owner,Review date,Status
+R-009,Key Vault has a public endpoint for CI runners,2,5,10,IP allow-list; audit logs,4,Mitigate (Self-hosted runner),Platform lead,2026-12-01,Open
+R-011,Production in single Azure region,2,4,8,GCP DR backup; PITR,4,Accept (RTO 4h),CTO,2027-03-01,Accepted

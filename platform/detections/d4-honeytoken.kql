@@ -1,0 +1,4 @@
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.KEYVAULT" and OperationName == "SecretGet"
+| where requestUri_s has "canary-"
+| project TimeGenerated, CallerIPAddress, requestUri_s, ResultSignature
